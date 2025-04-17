@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGameDto } from './dto/create-game.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Game, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { RawgService } from 'src/rawg/rawg.service';
 
 @Injectable()
@@ -12,7 +11,7 @@ export class GamesService {
   ) {}
 
   async search({ title }: { title: string }) {
-    let games = await this.prismaService.game.findMany({
+    let gamesFromDB = await this.prismaService.game.findMany({
       where: {
         title: {
           contains: title,
@@ -20,39 +19,22 @@ export class GamesService {
       },
     });
 
-    const gamesData: Prisma.GameCreateInput[] = [];
+    if (gamesFromDB.length) return gamesFromDB;
 
-    if (!games.length) {
-      const rawgGames = await this.rawgService.getListGames({ search: title });
+    const gamesData = await this.getGamesFromRawg(title);
 
-      rawgGames.forEach((game) => {
-        const gameData: Prisma.GameCreateInput = {
-          externalId: game.id.toString(),
-          title: game.name,
-          description: game.name,
-          platforms: game.platforms.map((platform) => platform.platform.name),
-          releaseDate: game.released,
-          rating: game.rating,
-          coverImage: game.background_image,
-        };
+    await this.prismaService.game.createMany({ data: gamesData });
 
-        gamesData.push(gameData);
-      });
-
-      await this.prismaService.game.createMany({ data: gamesData });
-    }
-
-    if (gamesData.length) {
-      games = await this.prismaService.game.findMany({
+    if (gamesData.length)
+      gamesFromDB = await this.prismaService.game.findMany({
         where: {
           title: {
             contains: title,
           },
         },
       });
-    }
 
-    return games;
+    return gamesFromDB;
   }
 
   async getAll() {
@@ -60,10 +42,34 @@ export class GamesService {
   }
 
   async findById({ id }: { id: string }) {
-    return await this.prismaService.game.findUnique({
+    const game = await this.prismaService.game.findUnique({
       where: {
         id,
       },
     });
+
+    return game;
+  }
+
+  private async getGamesFromRawg(title: string) {
+    const gamesData: Prisma.GameCreateInput[] = [];
+
+    const rawgGames = await this.rawgService.getListGames({ search: title });
+
+    rawgGames.forEach((game) => {
+      const gameData: Prisma.GameCreateInput = {
+        externalId: game.id.toString(),
+        title: game.name,
+        description: game.name,
+        platforms: game.platforms.map((platform) => platform.platform.name),
+        releaseDate: game.released,
+        rating: game.rating,
+        coverImage: game.background_image,
+      };
+
+      gamesData.push(gameData);
+    });
+
+    return gamesData;
   }
 }
