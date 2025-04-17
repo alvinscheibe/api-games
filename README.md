@@ -21,7 +21,7 @@ API RESTful desenvolvida com NestJS para gerenciamento de jogos, integrando com 
 ### 1. Clone o repositório
 
 ```bash
-git clone <url-do-repositorio>
+git clone git@github.com:alvinscheibe/api-games.git
 cd api-games
 ```
 
