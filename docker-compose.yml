@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis:alpine
+    container_name: api-games-redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - api-games
+
+  db:
+    image: postgres:16
+    container_name: api-games-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: api_games
+      POSTGRES_USER: api_games
+      POSTGRES_PASSWORD: api_games
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - api-games
+
+networks:
+  api-games:
+    name: "api-games"
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.34.0.0/24"
+
+volumes:
+  postgres-data:
+  redis-data:
