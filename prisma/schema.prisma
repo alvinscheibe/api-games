@@ -19,9 +19,9 @@ model Game {
   title       String
   description String
   platforms   String[]
-  releaseDate String
+  releaseDate String?
   rating      Float
-  coverImage  String
+  coverImage  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
