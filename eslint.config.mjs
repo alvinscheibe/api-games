@@ -27,9 +27,17 @@ export default tseslint.config(
   },
   {
     rules: {
+      '@typescript-eslint/interface-name-prefix': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      'brace-style': ['error', '1tbs', { allowSingleLine: true }],
+      curly: ['error', 'multi-line'],
+      'object-curly-spacing': ['error', 'always'],
+      'array-bracket-spacing': ['error', 'never'],
+      'arrow-parens': ['error', 'always'],
     },
   },
 );
