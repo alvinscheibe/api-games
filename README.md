@@ -114,3 +114,9 @@ Arquivos de request disponíveis:
 ```bash
 npx prisma studio
 ```
+
+### Testes
+
+```bash
+yarn test
+```
