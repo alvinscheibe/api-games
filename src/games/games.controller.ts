@@ -28,8 +28,14 @@ export class GamesController {
   }
 
   @Get()
-  async getAll() {
-    return await this.gamesService.getAll();
+  async getAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const limitNumber = limit ? parseInt(limit, 10) : 10;
+    
+    return await this.gamesService.getAll(pageNumber, limitNumber);
   }
 
   @UseInterceptors(CacheInterceptor)

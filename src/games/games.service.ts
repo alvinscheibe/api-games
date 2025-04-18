@@ -37,8 +37,33 @@ export class GamesService {
     return gamesFromDB;
   }
 
-  async getAll() {
-    return await this.prismaService.game.findMany();
+  async getAll(page = 1, limit = 10) {
+    const currentPage = page > 0 ? page : 1;
+    const itemsPerPage = limit > 0 ? limit : 10;
+    const skip = (currentPage - 1) * itemsPerPage;
+
+    const games = await this.prismaService.game.findMany({
+      skip,
+      take: itemsPerPage,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const total = await this.prismaService.game.count();
+    const totalPages = Math.ceil(total / itemsPerPage);
+
+    return {
+      data: games,
+      meta: {
+        total,
+        page: currentPage,
+        limit: itemsPerPage,
+        totalPages,
+        hasNextPage: currentPage < totalPages,
+        hasPreviousPage: currentPage > 1,
+      },
+    };
   }
 
   async findById({ id }: { id: string }) {
